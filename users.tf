@@ -41,13 +41,13 @@ resource "aws_iam_group" "group" {
 // }
 
 resource "aws_iam_group_policy_attachment" "attachment" {
-  count =  length(var.users) > 0 ? local.number_of_additional_policy : 0
+  count      = length(var.users) > 0 ? local.number_of_additional_policy : 0
   group      = aws_iam_group.group[0].name
   policy_arn = var.additional_policies[count.index]
 }
 
 resource "aws_iam_group_membership" "group" {
-  name = "${local.group_name}-membership"
+  name  = "${local.group_name}-membership"
   users = values(var.users)[*].username
   group = aws_iam_group.group[0].name
 }

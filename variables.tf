@@ -33,12 +33,27 @@ variable "project_name" {
 
 variable "additional_policies" {
   description = "Additional policy arns to attach to the group"
-  type = list(string)
-  default = [""]
+  type        = list(string)
+  default     = [""]
 }
 
 variable "permissions_boundary" {
   description = "If provided, all IAM roles will be created with this permissions boundary attached."
   type        = string
   default     = ""
+}
+
+variable "account_id" {
+  description = "AWS account id where this serverless deployment will create cloudformation resources etc"
+  type        = number
+}
+
+variable "application_stage" {
+  description = "Stage of this serverless application"
+  type        = string
+  default     = "staging"
+}
+
+variable "s3_bucket_name" {
+  description = "Custom s3 bucket name"
 }
