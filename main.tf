@@ -1,23 +1,25 @@
-resource "aws_iam_user" "iam_user" {
-  for_each             = var.users
-  name                 = each.value.username
-  force_destroy        = true
-  permissions_boundary = each.value.permissions_boundary
-
-  tags = {
-    applied_with = "terraform"
-    name         = each.value.name
-    description  = each.value.description
-    module_url   = "https://github.com/ryanoolala/terraform-aws-serverless-permission"
-  }
+locals {
+  group_name = "${replace(var.project_name, " ", "-")}-serverless-deployer-group"
+  number_of_additional_policy = length(var.additional_policies[0]) > 0 ? length(var.additional_policies) : 0
 }
 
-resource "aws_iam_access_key" "access_key" {
-  depends_on = [
-    aws_iam_user.iam_user
-  ]
-  for_each = var.users
+resource "aws_iam_role" "role" {
+  name = "${var.project_name}-serverless-deployer-role"
+  permissions_boundary = var.permissions_boundary
 
-  user    = each.value.username
-  pgp_key = each.value.pgp_key
+  assume_role_policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "ec2.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  }
+  EOF
 }
