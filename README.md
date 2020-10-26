@@ -4,7 +4,7 @@ Terraform module to create a serverless deployer role with limited privileges on
 
 The base policy and idea came from [https://github.com/Open-SL/serverless-permission-generator](https://github.com/Open-SL/serverless-permission-generator)
 
-This module will allow creation of the above generated policy json to facilitate environments where terraform is used.
+This module will allow creation of the above generated policy json in AWS automatically to facilitate environments where terraform is used.
 
 ## Example Usage
 
