@@ -45,6 +45,18 @@ inputs = {
   s3_bucket_names = ["serverless-deployment"]
 }
 ```
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12.0 |
+| aws | >= 2.23 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| aws | >= 2.23 |
 
 ## Inputs
 
