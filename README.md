@@ -1,20 +1,50 @@
 # terraform-aws-serverless-permission
 
-Terraform module to create a serverless deploy limited privilege IAM policy .
+Terraform module to create a serverless deployer role with limited privileges on IAM policy.
 
-base policy and idea came from [https://github.com/Open-SL/serverless-permission-generator](https://github.com/Open-SL/serverless-permission-generator)
+The base policy and idea came from [https://github.com/Open-SL/serverless-permission-generator](https://github.com/Open-SL/serverless-permission-generator)
 
-This is a terraform implementation for IaC users out there.
+This module will allow creation of the above generated policy json to facilitate environments where terraform is used.
 
-## Requirements
+## Example Usage
 
-No requirements.
+```hcl
+#terraform
+module "sls-role" {
+   users = {
+    my-project-name-1 = {
+      name = "my project deployer"
+      username = "serverless-deployer-my-project-name"
+      description = "serverless deploy role for project: my-project-name"
+      pgp_key = "${my_key}"
+      permissions_boundary = "arn:aws:iam::${my_account_id}:policy/MyBoundary"
+    },
 
-## Providers
+  }
+  account_id = get_aws_account_id()
+  permissions_boundary = "arn:aws:iam::${myu_account_id}:policy/MyBoundary"
+  project_name = "my-project-name"
+  s3_bucket_names = ["serverless-deployment"]
+}
 
-| Name | Version |
-|------|---------|
-| aws | n/a |
+#terragrunt
+inputs = {
+   users = {
+    my-project-name-1 = {
+      name = "my project deployer"
+      username = "serverless-deployer-my-project-name"
+      description = "serverless deploy role for project: my-project-name"
+      pgp_key = "${my_key}"
+      permissions_boundary = "arn:aws:iam::${get_aws_account_id()}:policy/MyBoundary"
+    },
+
+  }
+  account_id = get_aws_account_id()
+  permissions_boundary = "arn:aws:iam::${get_aws_account_id()}:policy/MyBoundary"
+  project_name = "my-project-name"
+  s3_bucket_names = ["serverless-deployment"]
+}
+```
 
 ## Inputs
 

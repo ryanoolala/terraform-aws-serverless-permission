@@ -38,7 +38,7 @@ variable "additional_policies" {
 }
 
 variable "permissions_boundary" {
-  description = "If provided, all IAM roles will be created with this permissions boundary attached."
+  description = "If provided, serverless deployer IAM role will be created with this permissions boundary attached."
   type        = string
   default     = ""
 }

@@ -1,5 +1,5 @@
 locals {
-  group_name                  = "${replace(var.project_name, " ", "-")}-serverless-deployer-group"
+  group_name = "${replace(var.project_name, " ", "-")}-serverless-deployer-group"
 
   s3_arns = [
     for s3_name in compact(var.s3_bucket_names) :
