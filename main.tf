@@ -1,10 +1,5 @@
-locals {
-  group_name                  = "${replace(var.project_name, " ", "-")}-serverless-deployer-group"
-  number_of_additional_policy = length(var.additional_policies[0]) > 0 ? length(var.additional_policies) : 0
-}
-
 resource "aws_iam_role" "role" {
-  name                 = "${var.project_name}-serverless-deployer-role"
+  name                 = "serverless-deployer-role-${var.project_name}"
   permissions_boundary = var.permissions_boundary
 
   assume_role_policy = <<-EOF
@@ -22,6 +17,60 @@ resource "aws_iam_role" "role" {
     ]
   }
   EOF
+}
+
+resource "aws_iam_role_policy_attachment" "attach" {
+  role       = aws_iam_role.role.name
+  policy_arn = aws_iam_policy.policy.arn
+}
+
+resource "aws_iam_policy" "policy" {
+  name   = "serverless-deployer-policy-${var.project_name}"
+  path   = "/"
+  policy = data.aws_iam_policy_document.seven.json
+}
+
+data "aws_iam_policy_document" "empty" {
+}
+
+data "aws_iam_policy_document" "zero" {
+  source_json   = data.aws_iam_policy_document.base.json
+  override_json = length(local.s3_arns) > 0 ? data.aws_iam_policy_document.s3.json : data.aws_iam_policy_document.empty.json
+}
+
+data "aws_iam_policy_document" "one" {
+  source_json   = data.aws_iam_policy_document.zero.json
+  override_json = var.enable_api_gateway ? data.aws_iam_policy_document.api_gateway.json : data.aws_iam_policy_document.empty.json
+}
+
+data "aws_iam_policy_document" "two" {
+  source_json   = data.aws_iam_policy_document.one.json
+  override_json = var.enable_ec2 ? data.aws_iam_policy_document.ec2.json : data.aws_iam_policy_document.empty.json
+}
+
+data "aws_iam_policy_document" "three" {
+  source_json   = data.aws_iam_policy_document.two.json
+  override_json = length(local.dynamodb_table_arns) > 0 ? data.aws_iam_policy_document.dynamodb.json : data.aws_iam_policy_document.empty.json
+}
+
+data "aws_iam_policy_document" "four" {
+  source_json   = data.aws_iam_policy_document.three.json
+  override_json = length(local.kinesis_stream_arns) > 0 ? data.aws_iam_policy_document.kinesis.json : data.aws_iam_policy_document.empty.json
+}
+
+data "aws_iam_policy_document" "five" {
+  source_json   = data.aws_iam_policy_document.four.json
+  override_json = length(local.sns_arns) > 0 ? data.aws_iam_policy_document.sns.json : data.aws_iam_policy_document.empty.json
+}
+
+data "aws_iam_policy_document" "six" {
+  source_json   = data.aws_iam_policy_document.five.json
+  override_json = length(local.sqs_arns) > 0 ? data.aws_iam_policy_document.sqs.json : data.aws_iam_policy_document.empty.json
+}
+
+data "aws_iam_policy_document" "seven" {
+  source_json   = data.aws_iam_policy_document.six.json
+  override_json = length(local.elb_arns) > 0 ? data.aws_iam_policy_document.elb.json : data.aws_iam_policy_document.empty.json
 }
 
 data "aws_iam_policy_document" "base" {
@@ -89,7 +138,7 @@ data "aws_iam_policy_document" "base" {
     ]
 
     resources = [
-      "arn:aws:cloudformation:${aws_region}:${var.account_id}:stack/${var.project_name}-${var.application_stage}/*"
+      "arn:aws:cloudformation:${var.aws_region}:${var.account_id}:stack/${var.project_name}-${var.application_stage}/*"
     ]
   }
 
@@ -221,48 +270,158 @@ data "aws_iam_policy_document" "base" {
       "arn:aws:iam::${var.account_id}:role/${var.project_name}-${var.application_stage}-${var.aws_region}-lambdaRole"
     ]
   }
-  // statement {
-  //   actions = [
-  //     "s3:*",
-  //   ]
-
-  //   resources = [
-  //     "arn:aws:s3:::${var.s3_bucket_name}/home/&{aws:username}",
-  //     "arn:aws:s3:::${var.s3_bucket_name}/home/&{aws:username}/*",
-  //   ]
-  // }
-
-  // statement {
-  //   actions = [
-  //   ]
-
-  //   resources = [
-  //   ]
-
-  //   condition {
-  //     test     = "StringLike"
-  //     variable = "s3:prefix"
-
-  //     values = [
-  //       "",
-  //       "home/",
-  //       "home/&{aws:username}/",
-  //     ]
-  //   }
-  // }
 }
 
-// data "aws_iam_policy_document" "example" {
-//   statement {
-//     sid = "1"
+data "aws_s3_bucket" "selected" {
+  count  = length(compact(var.s3_bucket_names))
+  bucket = var.s3_bucket_names[count.index]
+}
 
-//     actions = [
-//       "s3:ListAllMyBuckets",
-//       "s3:GetBucketLocation",
-//     ]
+data "aws_iam_policy_document" "s3" {
+  statement {
+    sid = "8"
 
-//     resources = [
-//       "arn:aws:s3:::*",
-//     ]
-//   }
-// }
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+
+    resources = concat(
+      [
+        "arn:aws:s3:::${var.project_name}*serverlessdeploy*",
+      ],
+      local.s3_arns
+    )
+
+    // resources = concat(
+    //   [
+    //     "arn:aws:s3:::${var.project_name}*serverlessdeploy*",
+    //   ],
+    //   data.aws_s3_bucket.selected.*.arn
+    // )
+  }
+}
+
+data "aws_iam_policy_document" "api_gateway" {
+  statement {
+    sid = "15"
+
+    actions = [
+      "apigateway:GET",
+      "apigateway:POST",
+      "apigateway:PUT",
+      "apigateway:DELETE",
+      "apigateway:PATCH"
+    ]
+
+    resources = [
+      "arn:aws:apigateway:*::/apis*",
+      "arn:aws:apigateway:*::/restapis*",
+      "arn:aws:apigateway:*::/apikeys*",
+      "arn:aws:apigateway:*::/usageplans*"
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "ec2" {
+  statement {
+    sid = "16"
+
+    actions = [
+      "ec2:AuthorizeSecurityGroupEgress",
+      "ec2:AuthorizeSecurityGroupIngress",
+      "ec2:CreateSecurityGroup",
+      "ec2:DeleteSecurityGroup",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs",
+      "ec2:DescribeDhcpOptions",
+      "ec2:RevokeSecurityGroupEgress",
+      "ec2:RevokeSecurityGroupIngress",
+      "ec2:CreateNetworkInterfacePermission",
+      "ec2:CreateNetworkInterface",
+      "ec2:DeleteNetworkInterfacePermission",
+      "ec2:DeleteNetworkInterface",
+      "ec2:createTags",
+      "ec2:deleteTags"
+    ]
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "dynamodb" {
+  statement {
+    sid = "17"
+
+    actions = [
+      "dynamodb:*"
+    ]
+
+    resources = local.dynamodb_table_arns
+  }
+}
+
+data "aws_iam_policy_document" "kinesis" {
+  statement {
+    sid = "18"
+
+    actions = [
+      "kinesis:*"
+    ]
+
+    resources = local.kinesis_stream_arns
+  }
+}
+
+data "aws_iam_policy_document" "sns" {
+  statement {
+    sid = "19"
+
+    actions = [
+      "sns:*"
+    ]
+
+    resources = local.sns_arns
+  }
+}
+
+data "aws_iam_policy_document" "sqs" {
+  statement {
+    sid = "20"
+
+    actions = [
+      "sqs.*"
+    ]
+
+    resources = local.sqs_arns
+  }
+}
+
+data "aws_iam_policy_document" "elb" {
+  statement {
+    sid = "21"
+
+    actions = [
+      "elasticloadbalancing:RegisterTargets",
+      "elasticloadbalancing:DescribeRules",
+      "elasticloadbalancing:DeleteRule",
+      "elasticloadbalancing:CreateTargetGroup",
+      "elasticloadbalancing:ModifyTargetGroup",
+      "elasticloadbalancing:ModifyTargetGroupAttributes",
+      "elasticloadbalancing:ModifyRule",
+      "elasticloadbalancing:ModifyListener",
+      "elasticloadbalancing:AddTags",
+      "elasticloadbalancing:DeleteTargetGroup",
+      "elasticloadbalancing:DescribeTargetGroups",
+      "elasticloadbalancing:DescribeTargetHealth",
+      "elasticloadbalancing:CreateRule"
+    ]
+
+    resources = local.elb_arns
+  }
+}
