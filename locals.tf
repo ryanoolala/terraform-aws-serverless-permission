@@ -3,7 +3,7 @@ locals {
 
   s3_arns = [
     for s3_name in compact(var.s3_bucket_names) :
-    "arn:aws:s3:::${s3_name}"
+    "arn:aws:s3:::${s3_name}*"
   ]
 
   dynamodb_table_arns = [
