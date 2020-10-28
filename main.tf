@@ -183,6 +183,7 @@ data "aws_iam_policy_document" "base" {
     actions = [
       "s3:PutObject",
       "s3:GetObject",
+      "s3:GetObjectMetadata",
       "s3:HeadObject",
       "s3:DeleteObject"
     ]
@@ -288,6 +289,7 @@ data "aws_iam_policy_document" "s3" {
       "s3:HeadObject",
       "s3:DeleteObject",
       "s3:GetBucketLocation",
+      "s3:GetObjectMetadata",
       "s3:ListBucket",
       "s3:GetBucketPolicy",
       "s3:ListBucketVersions"
@@ -299,13 +301,6 @@ data "aws_iam_policy_document" "s3" {
       ],
       local.s3_arns
     )
-
-    // resources = concat(
-    //   [
-    //     "arn:aws:s3:::${var.project_name}*serverlessdeploy*",
-    //   ],
-    //   data.aws_s3_bucket.selected.*.arn
-    // )
   }
 }
 
