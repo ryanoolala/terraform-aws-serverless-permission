@@ -47,7 +47,7 @@ resource "aws_iam_group_policy_attachment" "attachment" {
 }
 
 resource "aws_iam_group_policy_attachment" "serverless-deployer" {
-  count      = length(var.users) > 0 ? length(compact(var.additional_policies)) : 0
+  count      = length(var.users) > 0 ? 1 : 0
   group      = aws_iam_group.group[0].name
   policy_arn = aws_iam_policy.policy.arn
 }
