@@ -45,6 +45,11 @@ inputs = {
   s3_bucket_names = ["serverless-deployment"]
 }
 ```
+
+### Application stage
+
+`application_stage` variable is appended with a `*` in the iam resource permissions, this is to allow specific use cases where you want to deploy serverless applcations in pull requests reviews, and create deployments based off development. E.g `application_stage=development` will allow you to create workflows to deploy `stage: development-{PR_NUMBER}` serverless applications
+
 ## Requirements
 
 | Name | Version |

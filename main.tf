@@ -138,7 +138,7 @@ data "aws_iam_policy_document" "base" {
     ]
 
     resources = [
-      "arn:aws:cloudformation:${var.aws_region}:${var.account_id}:stack/${var.project_name}-${var.application_stage}/*"
+      "arn:aws:cloudformation:${var.aws_region}:${var.account_id}:stack/${var.project_name}-${var.application_stage}*/*"
     ]
   }
 
@@ -207,7 +207,7 @@ data "aws_iam_policy_document" "base" {
     ]
 
     resources = [
-      "arn:aws:lambda:${var.aws_region}:${var.account_id}:function:${var.project_name}-${var.application_stage}-*"
+      "arn:aws:lambda:${var.aws_region}:${var.account_id}:function:${var.project_name}-${var.application_stage}*-*"
     ]
   }
 
@@ -232,7 +232,7 @@ data "aws_iam_policy_document" "base" {
     ]
 
     resources = [
-      "arn:aws:events:${var.aws_region}:${var.account_id}:rule/${var.project_name}-${var.application_stage}-${var.aws_region}"
+      "arn:aws:events:${var.aws_region}:${var.account_id}:rule/${var.project_name}-${var.application_stage}*-${var.aws_region}"
     ]
   }
   statement {
@@ -243,7 +243,7 @@ data "aws_iam_policy_document" "base" {
     ]
 
     resources = [
-      "arn:aws:events:${var.aws_region}:${var.account_id}:rule/${var.project_name}-${var.application_stage}-*"
+      "arn:aws:events:${var.aws_region}:${var.account_id}:rule/${var.project_name}-${var.application_stage}*-*"
     ]
   }
   statement {
@@ -269,7 +269,7 @@ data "aws_iam_policy_document" "base" {
     ]
 
     resources = [
-      "arn:aws:iam::${var.account_id}:role/${var.project_name}-${var.application_stage}-${var.aws_region}-lambdaRole"
+      "arn:aws:iam::${var.account_id}:role/${var.project_name}-${var.application_stage}*-${var.aws_region}-lambdaRole"
     ]
   }
 }
