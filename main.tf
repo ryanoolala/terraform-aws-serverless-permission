@@ -250,6 +250,7 @@ data "aws_iam_policy_document" "base" {
     sid = "13"
 
     actions = [
+      "iam:GetRole",
       "iam:PassRole"
     ]
 
@@ -292,6 +293,7 @@ data "aws_iam_policy_document" "s3" {
       "s3:GetObjectMetadata",
       "s3:ListBucket",
       "s3:GetBucketPolicy",
+      "s3:DeleteBucketPolicy",
       "s3:ListBucketVersions"
     ]
 
