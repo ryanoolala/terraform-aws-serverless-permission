@@ -30,15 +30,12 @@ resource "aws_iam_group" "group" {
   name = local.group_name
 }
 
-// resource "aws_iam_group_policy" "serverless_policy" {
-//   depends_on = [
-//     aws_iam_user.iam_user
-//   ]
-//   name  = "${local.group_name}-policy"
-//   group = aws_iam_group.group[0].name
-
-//   policy = aws_iam_policy.serverless_policy
-// }
+resource "aws_iam_group_policy" "serverless_policy" {
+  name  = "${local.group_name}-policy"
+  group = aws_iam_group.group[0].name
+  count  = length(var.users) > 0 ? var.custom_policy != "" ? 1 : 0 : 0
+  policy = var.custom_policy
+}
 
 resource "aws_iam_group_policy_attachment" "attachment" {
   count      = length(var.users) > 0 ? length(compact(var.additional_policies)) : 0
