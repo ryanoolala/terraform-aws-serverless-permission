@@ -66,6 +66,12 @@ variable "enable_ec2" {
   default     = false
 }
 
+variable "custom_policy" {
+  description = "custom policy to be added to role using the EOF syntax"
+  type        = string
+  default     = ""
+}
+
 variable "dynamodb_table_names" {
   description = "List of dynamodb tables resources to manage"
   type        = list(string)

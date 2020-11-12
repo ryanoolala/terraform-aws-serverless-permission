@@ -19,6 +19,14 @@ resource "aws_iam_role" "role" {
   EOF
 }
 
+# Only create the custom inline policy for this role if it's not empty
+resource "aws_iam_role_policy" "custom_policy" {
+  name   = "custom_policy"
+  role   = aws_iam_role.role.name
+  count  = var.custom_policy != "" ? 1 : 0
+  policy = var.custom_policy
+}
+
 resource "aws_iam_role_policy_attachment" "attach" {
   role       = aws_iam_role.role.name
   policy_arn = aws_iam_policy.policy.arn
