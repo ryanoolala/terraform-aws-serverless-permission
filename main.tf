@@ -330,7 +330,7 @@ data "aws_iam_policy_document" "api_gateway" {
       "arn:aws:apigateway:*::/apis*",
       "arn:aws:apigateway:*::/restapis*",
       "arn:aws:apigateway:*::/apikeys*",
-      "arn:aws:apigateway:*::/usageplans*"
+      "arn:aws:apigateway:*::/usageplans*",
       "arn:aws:apigateway:*::/domainnames*"
     ]
   }
