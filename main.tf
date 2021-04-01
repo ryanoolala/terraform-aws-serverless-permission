@@ -211,6 +211,13 @@ data "aws_iam_policy_document" "base" {
       "lambda:InvokeFunction",
       "lambda:PublishVersion",
       "lambda:RemovePermission",
+      "lambda:GetFunctionConcurrency",
+      "lambda:PutFunctionConcurrency",
+      "lambda:DeleteFunctionConcurrency",
+      "lambda:ListProvisionedConcurrencyConfigs",
+      "lambda:GetProvisionedConcurrencyConfig",
+      "lambda:PutProvisionedConcurrencyConfig",
+      "lambda:DeleteProvisionedConcurrencyConfig",
       "lambda:Update*"
     ]
 
