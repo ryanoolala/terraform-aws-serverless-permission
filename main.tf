@@ -207,6 +207,7 @@ data "aws_iam_policy_document" "base" {
     actions = [
       "lambda:AddPermission",
       "lambda:CreateAlias",
+      "lambda:DeleteAlias",
       "lambda:DeleteFunction",
       "lambda:InvokeFunction",
       "lambda:PublishVersion",
