@@ -282,6 +282,7 @@ data "aws_iam_policy_document" "base" {
       "iam:CreateRole",
       "iam:PutRolePolicy",
       "iam:AttachRolePolicy",
+      "iam:DetachRolePolicy",
       "iam:DeleteRolePolicy",
       "iam:DeleteRole"
     ]
