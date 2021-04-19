@@ -292,6 +292,19 @@ data "aws_iam_policy_document" "base" {
       "arn:aws:iam::${var.account_id}:role/${var.project_name}-*"
     ]
   }
+  statement {
+    sid = "22"
+
+    actions = [
+      "logs:PutSubscriptionFilter",
+      "logs:DeleteSubscriptionFilter",
+      "logs:DescribeSubscriptionFilters"
+    ]
+
+    resources = [
+      "arn:aws:logs:${var.aws_region}:${var.account_id}:log-group:/aws/lambda/${var.project_name}*"
+    ]
+  }
 }
 
 data "aws_s3_bucket" "selected" {
