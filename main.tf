@@ -347,7 +347,8 @@ data "aws_iam_policy_document" "api_gateway" {
       "apigateway:POST",
       "apigateway:PUT",
       "apigateway:DELETE",
-      "apigateway:PATCH"
+      "apigateway:PATCH",
+      "apigateway:UpdateRestApiPolicy"
     ]
 
     resources = [
